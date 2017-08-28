@@ -27,5 +27,5 @@ func loadPage(title string) *Page {
     	return nil, err
     }
     body, _ := ioutil.ReadFile(filename)
-    return &Page{Title: title, Body: body}
+    return &Page{Title: title, Body: body}, nil
 }
