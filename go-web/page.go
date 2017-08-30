@@ -1,7 +1,6 @@
 package main 
 	
 import (
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"html/template"
@@ -15,21 +14,16 @@ type Page struct {
 }
 
 func (p *Page) save() error {
-	filename := p.title + ".txt"
-	return ioutil.WriteFile(filename, p.body, 0600)
+	filename := p.Title + ".txt"
+	return ioutil.WriteFile(filename, p.Body, 0600)
 }
 
-func loadPage (title string) *Page {
+func loadPage(title string) (*Page, error) {
 	filename := title + ".txt"
-	body, _ := ioutil.ReadFile(filename)
-}
-
-func loadPage(title string) *Page {
-    filename := title + ".txt"
+    body, err := ioutil.ReadFile(filename)
     if err != nil {
-    	return nil, err
+        return nil, err
     }
-    body, _ := ioutil.ReadFile(filename)
     return &Page{Title: title, Body: body}, nil
 }
 
@@ -54,13 +48,13 @@ func editHandler(w http.ResponseWriter, r *http.Request) {
 
 func renderTemplate(w http.ResponseWriter, tmpl string, p *Page) {
     t, error := template.ParseFiles(tmpl + ".html")
-    if err != nil {
-        http.Error(w, err.Error(), http.StatusInternalServerError)
+    if error != nil {
+        http.Error(w, error.Error(), http.StatusInternalServerError)
         return
     }
-    err = templates.ExecuteTemplate(w, tmpl+".html", p)
-    if err != nil {
-        http.Error(w, err.Error(), http.StatusInternalServerError)
+    error = t.Execute(w, p)
+    if error != nil {
+        http.Error(w, error.Error(), http.StatusInternalServerError)
     }
 }
 
