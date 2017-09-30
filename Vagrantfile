@@ -66,6 +66,6 @@ Vagrant.configure("2") do |config|
   # documentation for more information about their specific syntax and use.
   config.vm.provision "shell", inline: <<-SHELL
      pwd 
-     ~/projects/go-start/config.sh
+     ./config.sh
   SHELL
 end
