@@ -9,8 +9,14 @@ import (
 	"strings"
 )
 
+import "database/sql"
+import _ "github.com/go-sql-driver/mysql"
+
 var books []Book
 var	router = mux.NewRouter()
+
+var db *sql.DB 
+var err error
 
 type Author struct {
     Name  string `json:"name,omitempty"`
@@ -50,14 +56,24 @@ func GetBooks(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetBook(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-    for _, item := range books {
-        if item.ID == params["id"] {
-            json.NewEncoder(w).Encode(item)
-            return
-        }
+    var book Book
+
+ 	db, err = sql.Open("mysql", "roort:@/test")
+    if err != nil {
+        panic(err.Error())    
     }
-    json.NewEncoder(w).Encode(&Book{})
+
+    defer db.Close()
+
+    err = db.Ping()
+    if err != nil {
+        panic(err.Error())
+    }
+
+    params := mux.Vars(r)
+
+    db.QueryRow("SELECT id, title, ISBN, pages FROM books WHERE id=?", params["id"]).Scan(&book.ID , &book.Title , &book.ISBN, &book.Pages)
+    json.NewEncoder(w).Encode(book)
 }
 
 func CreateBook(w http.ResponseWriter, r *http.Request) {
