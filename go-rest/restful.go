@@ -58,20 +58,17 @@ func GetBooks(w http.ResponseWriter, r *http.Request) {
 func GetBook(w http.ResponseWriter, r *http.Request) {
     var book Book
 
- 	db, err = sql.Open("mysql", "roort:@/test")
+	db, err = sql.Open("mysql", "root:@/test")
     if err != nil {
         panic(err.Error())    
     }
-
     defer db.Close()
-
     err = db.Ping()
     if err != nil {
         panic(err.Error())
     }
 
     params := mux.Vars(r)
-
     db.QueryRow("SELECT id, title, ISBN, pages FROM books WHERE id=?", params["id"]).Scan(&book.ID , &book.Title , &book.ISBN, &book.Pages)
     json.NewEncoder(w).Encode(book)
 }
